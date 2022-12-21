@@ -3,3 +3,5 @@ Symfony BileMo API
 
 packages installed:
 symfony/maker-bundle
+orm
+
