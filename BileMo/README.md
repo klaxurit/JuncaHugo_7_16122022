@@ -6,3 +6,5 @@ symfony/maker-bundle
 orm
 orm-fixtures
 security
+wildurand/hateoas-bundle
+sension/framework-extra-bundle
