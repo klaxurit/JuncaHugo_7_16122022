@@ -8,3 +8,5 @@ orm-fixtures
 security
 wildurand/hateoas-bundle
 sension/framework-extra-bundle
+symfony/validator
+doctrinne/annotations
