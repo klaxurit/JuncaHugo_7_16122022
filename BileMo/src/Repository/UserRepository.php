@@ -39,6 +39,19 @@ class UserRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllWithPagination($page, $limit, $company)
+    {
+        $qb= $this->createQueryBuilder('u')
+        ->where('u.company = :val')
+        ->setParameter('val', $company)
+        ->select('u')
+        ->orderBy('u.id', 'asc')
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

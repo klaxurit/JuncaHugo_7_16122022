@@ -21,6 +21,13 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $listCompany = [];
+        // Création d'une company personnalisé
+        $company = new Company();
+        $company->setName("CompanyTest");
+        $company->setRoles(["ROLE_USER"]);
+        $company->setPassword($this->userPasswordHasher->hashPassword($company, "password"));
+        $manager->persist($company);
+        $listCompany[] = $company;
         for ($i = 0; $i < 5; $i++) {
             $company = new Company();
             $company->setName("Company" . $i);
