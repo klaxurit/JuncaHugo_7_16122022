@@ -107,6 +107,11 @@ class UserController extends AbstractController
     /**
      * Cette méthode permet de supprimer un utilisateur grâce à son ID
      * 
+     * @OA\Response(
+     *     response=204,
+     *     description="Retourne un code 204 qui confirme la suppression de l'utilisateur",
+     * )
+     * 
      * @OA\Tag(name="Users")
      * @param EntityManagerInterface $em
      * @param User $user
@@ -125,7 +130,7 @@ class UserController extends AbstractController
     /**
      * Cette méthode permet de créer un utilisateur
      * 
-     * @OA\RequestBody(@Model(type=User::class, groups={"create"}))
+     * @OA\RequestBody(@Model(type=User::class, groups={"createUser"}))
      * @OA\Response(
      *     response=201,
      *     description="Créer un utilisateur lié à un client",
@@ -160,6 +165,7 @@ class UserController extends AbstractController
         // On vide le cache. 
         $this->cache->invalidateTags(["usersCache"]);
 
+        $user->setCompany($this->getUser());
         $jsonUser = $this->serializer->serialize($user, 'json', SerializationContext::create()->setGroups(["getUsers"]));
         $location = $urlGenerator->generate('detailUser', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
