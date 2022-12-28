@@ -11,3 +11,5 @@ sension/framework-extra-bundle
 symfony/validator
 doctrinne/annotations
 lexik/jwt-authentication-bundle
+nelmio/api-doc-bundle
+twig asset

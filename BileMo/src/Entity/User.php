@@ -37,17 +37,17 @@ class User
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "createUser"])]
     #[Assert\NotBlank(message: "Le prénom de l'utilisateur est obligatoire")]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "createUser"])]
     #[Assert\NotBlank(message: "Le nom de l'utilisateur est obligatoire")]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "createUser"])]
     #[Assert\NotBlank(message: "L'email de l'utilisateur est obligatoire")]
     private ?string $email = null;
 

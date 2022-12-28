@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Company;
 use App\Repository\UserRepository;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,22 +16,59 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class UserController extends AbstractController
 {
-    public function __construct(private TagAwareCacheInterface $cache) {}
+    public function __construct(private TagAwareCacheInterface $cache, SerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
 
+    /**
+     * Cette méthode permet de récupérer l'ensemble des ustilisateurs liés à un client.
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne la liste des utilisateurs liés à un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="La page que l'on veut récupérer",
+     *     @OA\Schema(type="int")
+     * )
+     *
+     * @OA\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     description="Le nombre d'éléments que l'on veut récupérer",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="Users")
+     *
+     * @param UserRepository $userRepository
+     * @param SerializerInterface $serializer
+     * @param Request $request
+     * @return JsonResponse
+     */
     #[Route('/api/users', name: 'users', methods: ['GET'])]
     public function getAllUsers(
-        UserRepository $userRepository, 
-        SerializerInterface $serializer, 
-        Request $request): JsonResponse
-    {
+        UserRepository $userRepository,
+        SerializerInterface $serializer,
+        Request $request
+    ): JsonResponse {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 3);
 
         $idCache = "getAllUsers-" . $page . "-" . $limit;
-        
+
         $jsonUserList = $this->cache->get($idCache, function (ItemInterface $item) use ($userRepository, $page, $limit, $serializer) {
             $company = $this->getUser();
             $context = SerializationContext::create()->setGroups(["getUsers"]);
@@ -45,16 +81,39 @@ class UserController extends AbstractController
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * Cette méthode permet de récuperer un utilisateur grâce à son ID
+     * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne le détail d'un utilisateurs liés à un client",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Tag(name="Users")
+     * @param User $user
+     * @return JsonResponse
+     */
     #[Route('/api/users/{id}', name: 'detailUser', methods: ['GET'])]
-    public function getDetailUser(User $user, SerializerInterface $serializer): JsonResponse 
+    public function getDetailUser(User $user): JsonResponse
     {
         $context = SerializationContext::create()->setGroups(['getUsers']);
-        $jsonUser = $serializer->serialize($user, 'json', $context);
+        $jsonUser = $this->serializer->serialize($user, 'json', $context);
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * Cette méthode permet de supprimer un utilisateur grâce à son ID
+     * 
+     * @OA\Tag(name="Users")
+     * @param EntityManagerInterface $em
+     * @param User $user
+     * @return JsonResponse
+     */
     #[Route('/api/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
-    public function deleteUser(User $user, EntityManagerInterface $em): JsonResponse 
+    public function deleteUser(User $user, EntityManagerInterface $em): JsonResponse
     {
         $this->cache->invalidateTags(["usersCache"]);
         $em->remove($user);
@@ -63,21 +122,35 @@ class UserController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/users', name:"createUser", methods: ['POST'])]
+    /**
+     * Cette méthode permet de créer un utilisateur
+     * 
+     * @OA\RequestBody(@Model(type=User::class, groups={"create"}))
+     * @OA\Response(
+     *     response=201,
+     *     description="Créer un utilisateur lié à un client",
+     *     @Model(type=User::class, groups={"createUser"})
+     * )
+     * @OA\Tag(name="Users")
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param UrlGeneratorInterface $urlGenerator
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    #[Route('/api/users', name: "createUser", methods: ['POST'])]
     public function createUser(
         Request $request,
-        SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator
-        ): JsonResponse 
-    {
-        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+    ): JsonResponse {
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
 
         // On vérifie les erreurs
         $errors = $validator->validate($user);
         if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($this->serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "La requête est invalide");
         }
 
@@ -87,7 +160,7 @@ class UserController extends AbstractController
         // On vide le cache. 
         $this->cache->invalidateTags(["usersCache"]);
 
-        $jsonUser = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(["getUsers"]));
+        $jsonUser = $this->serializer->serialize($user, 'json', SerializationContext::create()->setGroups(["getUsers"]));
         $location = $urlGenerator->generate('detailUser', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
