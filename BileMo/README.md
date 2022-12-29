@@ -37,22 +37,28 @@
 
 1. Clonez le dépôt git :
 git clone https://github.com/klaxurit/klaxurit-JuncaHugo_6_16092022.git
+
 2. Installez les dépendances en utilisant Composer :
 composer install
+
 3. Copiez le .env en .env.local et modifier les paramètres sql.
-4. Créer un dossier jwt dans le dossier config et générez vos clefs grâce aux commandes suivantes:
+
+5. Créer un dossier jwt dans le dossier config et générez vos clefs grâce aux commandes suivantes:
 openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
 openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
 Puis ajoutez la passphrase utilisez dans la variable JWT_PASSPHRASE de votre .env.local
-5. Créez la base de données et effectuez les migrations en utilisant les commandes Doctrine :
+
+6. Créez la base de données et effectuez les migrations en utilisant les commandes Doctrine :
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 
 ## Exécution
 
 Exécutez le serveur local Symfony pour lancer l'application :
+
 php bin/console server:run
-Vous devriez maintenant pouvoir accéder à l'application en accédant à l'adresse `http://127.0.0.1:8000` dans votre navigateur.
+
+Vous devriez maintenant pouvoir accéder à la documentation de l'API en accédant à l'adresse `http://127.0.0.1:8000/api/doc` dans votre navigateur.
 
 Pour chargez un jeux de donnée veuillez saisir cette commande dans votre terminal:
 
@@ -61,8 +67,9 @@ php bin/console doctrine:fixtures:load
 Un compte test sera créer en plus des autres comptes.
 
 ### Compte test
-identifiant: Companytest
-Mot de passe: password
+
+- Identifiant: Companytest
+- Mot de passe: password
 
 
 
