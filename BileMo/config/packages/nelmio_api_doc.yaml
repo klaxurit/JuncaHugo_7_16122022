@@ -48,6 +48,13 @@ nelmio_api_doc:
                     name: Authorization # or another header name
         security:
             - bearerAuth: []
+    models:
+        names:
+            - { alias: MainUser,        type: App\Entity\User}
+            - { alias: User_get,  type: App\Entity\User, groups: [getUsers] }
+            - { alias: User_create,  type: App\Entity\User, groups: [createUser] }
+            - { alias: MainCompany,  type: App\Entity\Company }
+            - { alias: Company_users_get,  type: App\Entity\Company, groups: [getUsers] }
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
