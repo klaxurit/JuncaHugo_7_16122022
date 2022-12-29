@@ -35,7 +35,7 @@ class UserController extends AbstractController
      *     description="Retourne la liste des utilisateurs liés à un client",
      *     @OA\JsonContent(
      *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class))
+     *        @OA\Items(ref=@Model(type=User::class, groups={"getUsers"}))
      *     )
      * )
      * @OA\Parameter(
@@ -99,6 +99,7 @@ class UserController extends AbstractController
     #[Route('/api/users/{id}', name: 'detailUser', methods: ['GET'])]
     public function getDetailUser(User $user): JsonResponse
     {
+        $this->denyAccessUnlessGranted('USER_VIEW', $user);
         $context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUser = $this->serializer->serialize($user, 'json', $context);
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
@@ -120,6 +121,7 @@ class UserController extends AbstractController
     #[Route('/api/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
     public function deleteUser(User $user, EntityManagerInterface $em): JsonResponse
     {
+        $this->denyAccessUnlessGranted('USER_DELETE', $user);
         $this->cache->invalidateTags(["usersCache"]);
         $em->remove($user);
         $em->flush();
@@ -158,14 +160,13 @@ class UserController extends AbstractController
             return new JsonResponse($this->serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
             //throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "La requête est invalide");
         }
-
+        
+        $user->setCompany($this->getUser());
         $em->persist($user);
         $em->flush();
-
         // On vide le cache. 
         $this->cache->invalidateTags(["usersCache"]);
 
-        $user->setCompany($this->getUser());
         $jsonUser = $this->serializer->serialize($user, 'json', SerializationContext::create()->setGroups(["getUsers"]));
         $location = $urlGenerator->generate('detailUser', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
