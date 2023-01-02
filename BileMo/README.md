@@ -16,7 +16,7 @@
 
 ## Prérequis
 
-- PHP >= 7.2.5
+- PHP >= 8.1
 - Composer
 
 ## Paquet installé via composer
