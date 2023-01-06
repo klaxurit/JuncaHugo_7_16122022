@@ -27,13 +27,11 @@
 - orm-fixtures
 - security
 - wildurand/hateoas-bundle
-- sension/framework-extra-bundle
 - symfony/validator
 - doctrinne/annotations
 - lexik/jwt-authentication-bundle
 - nelmio/api-doc-bundle
 - twig asset
-- babdev/pagerfanta-bundle:^3.6
 
 ## Installation
 

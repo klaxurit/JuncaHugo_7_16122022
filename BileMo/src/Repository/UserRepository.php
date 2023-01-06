@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -41,15 +41,13 @@ class UserRepository extends ServiceEntityRepository
 
     public function findAllWithPagination($page, $limit, $company)
     {
-        $qb= $this->createQueryBuilder('u')
+        $qb = $this->createQueryBuilder('u')
         ->where('u.company = :val')
         ->setParameter('val', $company)
         ->select('u')
-        ->orderBy('u.id', 'asc')
-        ->setFirstResult(($page - 1) * $limit)
-        ->setMaxResults($limit);
+        ->orderBy('u.id', 'asc');
 
-        return $qb->getQuery()->getResult();
+        return $this->paginate($qb, $page, $limit);
     }
 
 //    /**

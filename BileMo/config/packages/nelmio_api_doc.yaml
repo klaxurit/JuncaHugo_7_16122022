@@ -24,6 +24,8 @@ nelmio_api_doc:
                                 application/json:
                                     schema:
                                         $ref: '#/components/schemas/Token'
+                        '401':
+                            description: Identifiants incorrects
         components:
             schemas:
                 Token:

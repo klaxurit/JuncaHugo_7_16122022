@@ -29,6 +29,12 @@ class ProductController extends AbstractController
      *        @OA\Items(ref=@Model(type=Product::class))
      *     )
      * )
+     * 
+     * @OA\Response(
+     *     response=404,
+     *     description="Page introuvable",
+     * )
+     * 
      * @OA\Parameter(
      *     name="page",
      *     in="query",
@@ -71,6 +77,19 @@ class ProductController extends AbstractController
 
     /**
      * Cette méthode permet de récuperer un produit grâce à son ID
+     * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Retourne le detail d'un produit",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class))
+     *     )
+     * )
+     * @OA\Response(
+     *     response=404,
+     *     description="Page introuvable",
+     * )
      * 
      * @OA\Tag(name="Products")
      * @param SerializerInterface $serializer
