@@ -17,6 +17,7 @@
 ## Prérequis
 
 - PHP >= 8.1
+- Activez ext-sodium dans votre php.ini ( en décommentant la ligne associée )
 - Composer
 
 ## Paquet installé via composer
@@ -32,39 +33,40 @@
 - lexik/jwt-authentication-bundle
 - nelmio/api-doc-bundle
 - twig asset
+- babdev/pagerfanta-bundle:^3.6
 
 ## Installation
 
 1. Clonez le dépôt git :
-git clone https://github.com/klaxurit/klaxurit-JuncaHugo_6_16092022.git
+``git clone https://github.com/klaxurit/klaxurit-JuncaHugo_6_16092022.git``
 
 2. Installez les dépendances en utilisant Composer :
-composer install
+``composer install``
 
 3. Copiez le .env en .env.local et modifier les paramètres sql.
 
 5. Créer un dossier jwt dans le dossier config et générez vos clefs grâce aux commandes suivantes:
-openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
-openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
+- ``openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096``
+- ``openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout``
 Puis ajoutez la passphrase utilisez dans la variable JWT_PASSPHRASE de votre .env.local
 
 6. Créez la base de données et effectuez les migrations en utilisant les commandes Doctrine :
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
+- ``php bin/console doctrine:database:create``
+- ``php bin/console doctrine:migrations:migrate``
 
 ## Exécution
 
 Exécutez le serveur local Symfony pour lancer l'application :
 
-php bin/console server:run
+``php bin/console server:run``
 
 Vous devriez maintenant pouvoir accéder à la documentation de l'API en accédant à l'adresse `http://127.0.0.1:8000/api/doc` dans votre navigateur.
 
 Pour chargez un jeux de donnée veuillez saisir cette commande dans votre terminal:
 
-php bin/console doctrine:fixtures:load
+``php bin/console doctrine:fixtures:load``
 
-Un compte test sera créer en plus des autres comptes.
+Un compte test sera créé en plus des autres comptes.
 
 ### Compte test
 
