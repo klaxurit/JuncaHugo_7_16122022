@@ -38,6 +38,12 @@ class UserController extends AbstractController
      *        @OA\Items(ref=@Model(type=User::class, groups={"getUsers"}))
      *     )
      * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Page introuvable",
+     * )
+     *
      * @OA\Parameter(
      *     name="page",
      *     in="query",
@@ -92,6 +98,12 @@ class UserController extends AbstractController
      *        @OA\Items(ref=@Model(type=User::class))
      *     )
      * )
+     * 
+     * @OA\Response(
+     *     response=404,
+     *     description="Page introuvable",
+     * )
+     * 
      * @OA\Tag(name="Users")
      * @param User $user
      * @return JsonResponse
@@ -111,6 +123,11 @@ class UserController extends AbstractController
      * @OA\Response(
      *     response=204,
      *     description="Retourne un code 204 qui confirme la suppression de l'utilisateur",
+     * )
+     * 
+     * @OA\Response(
+     *     response=404,
+     *     description="Page introuvable",
      * )
      * 
      * @OA\Tag(name="Users")
@@ -138,6 +155,12 @@ class UserController extends AbstractController
      *     description="Créer un utilisateur lié à un client",
      *     @Model(type=User::class, groups={"createUser"})
      * )
+     * 
+     * @OA\Response(
+     *     response=400,
+     *     description="Mauvaise requête",
+     * )
+     * 
      * @OA\Tag(name="Users")
      * @param Request $request
      * @param EntityManagerInterface $em

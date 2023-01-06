@@ -48,7 +48,9 @@ class User
 
     #[ORM\Column(length: 255)]
     #[Groups(["getUsers", "createUser"])]
-    //verif email
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
     #[Assert\NotBlank(message: "L'email de l'utilisateur est obligatoire")]
     private ?string $email = null;
 
