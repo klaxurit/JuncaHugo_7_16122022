@@ -78,7 +78,6 @@ class UserController extends AbstractController
         $jsonUserList = $this->cache->get($idCache, function (ItemInterface $item) use ($userRepository, $page, $limit, $serializer) {
             $company = $this->getUser();
             $context = SerializationContext::create()->setGroups(["getUsers"]);
-            echo ("L'ELEMENT N'EST PAS ENCORE EN CACHE !\n");
             $item->tag("usersCache");
             $userList = $userRepository->findAllWithPagination($page, $limit, $company);
             return $serializer->serialize($userList, 'json', $context);
@@ -109,11 +108,11 @@ class UserController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/users/{id}', name: 'detailUser', methods: ['GET'])]
-    public function getDetailUser(User $user): JsonResponse
+    public function getDetailUser(int $id, UserRepository $userRepository): JsonResponse
     {
-        $this->denyAccessUnlessGranted('USER_VIEW', $user);
+        $this->denyAccessUnlessGranted('USER_VIEW', $this->getUser());
         $context = SerializationContext::create()->setGroups(['getUsers']);
-        $jsonUser = $this->serializer->serialize($user, 'json', $context);
+        $jsonUser = $this->serializer->serialize($userRepository->findById($id), 'json', $context);
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 

@@ -9,7 +9,7 @@ use Pagerfanta\Pagerfanta;
 
 abstract class AbstractRepository extends ServiceEntityRepository
 {
-    protected function paginate(QueryBuilder $qb, $limit, $page): Pagerfanta
+    protected function paginate(QueryBuilder $qb, $page, $limit): Pagerfanta
     {
         if(0 == $limit ) {
             throw new \LogicException('$limit must be greater than 0.');
@@ -17,8 +17,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
         $pager = new Pagerfanta(new QueryAdapter($qb));
         
-        $pager->setMaxPerPage($limit);
+        $pager->setAllowOutOfRangePages(true);
         $pager->setCurrentPage($page);
+        $pager->setMaxPerPage($limit);
 
         return $pager;
     }

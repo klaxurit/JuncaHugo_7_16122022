@@ -65,8 +65,6 @@ class ProductController extends AbstractController
         $idCache = "getAllProducts-" . $page . "-" . $limit;
 
         $productList = $cache->get($idCache, function (ItemInterface $item) use ($productRepository, $page, $limit) {
-            //$context = SerializationContext::create()->setGroups(["getProducts"]);
-            echo ("L'ELEMENT N'EST PAS ENCORE EN CACHE !\n");
             $item->tag("productsCache");
             return $productRepository->findAllWithPagination($page, $limit);
         });
@@ -92,13 +90,14 @@ class ProductController extends AbstractController
      * )
      * 
      * @OA\Tag(name="Products")
+     * @param int $id
+     * @param ProductRepository $productRepository
      * @param SerializerInterface $serializer
-     * @param Product $product
      */
     #[Route('/api/products/{id}', name: 'detailProduct', methods: ['GET'])]
-    public function getDetailProduct(Product $product, SerializerInterface $serializer): JsonResponse 
+    public function getDetailProduct(int $id, ProductRepository $productRepository, SerializerInterface $serializer): JsonResponse 
     {
-        $jsonProduct = $serializer->serialize($product, 'json');
+        $jsonProduct = $serializer->serialize($productRepository->findById($id), 'json');
         return new JsonResponse($jsonProduct, Response::HTTP_OK, [], true);
     }
 }
