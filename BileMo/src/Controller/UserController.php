@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Security\Voter\UserVoter;
 use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -104,15 +105,16 @@ class UserController extends AbstractController
      * )
      * 
      * @OA\Tag(name="Users")
-     * @param User $user
+     * @param int $id
+     * @param UserRepository $userRepository
      * @return JsonResponse
      */
-    #[Route('/api/users/{id}', name: 'detailUser', methods: ['GET'])]
+    #[Route('/api/users/{id<\d+>}', name: 'detailUser', methods: ['GET'])]
     public function getDetailUser(int $id, UserRepository $userRepository): JsonResponse
     {
-        $this->denyAccessUnlessGranted('USER_VIEW', $this->getUser());
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $userRepository->find($id));
         $context = SerializationContext::create()->setGroups(['getUsers']);
-        $jsonUser = $this->serializer->serialize($userRepository->findById($id), 'json', $context);
+        $jsonUser = $this->serializer->serialize($userRepository->find($id), 'json', $context);
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 
@@ -131,13 +133,15 @@ class UserController extends AbstractController
      * 
      * @OA\Tag(name="Users")
      * @param EntityManagerInterface $em
-     * @param User $user
+     * @param int $id
+     * @param UserRepository $userRepository
      * @return JsonResponse
      */
-    #[Route('/api/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
-    public function deleteUser(User $user, EntityManagerInterface $em): JsonResponse
+    #[Route('/api/users/{id<\d+>}', name: 'deleteUser', methods: ['DELETE'])]
+    public function deleteUser(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
     {
-        $this->denyAccessUnlessGranted('USER_DELETE', $user);
+        $this->denyAccessUnlessGranted('USER_DELETE', $userRepository->find($id));
+        $user = $userRepository->find($id);
         $this->cache->invalidateTags(["usersCache"]);
         $em->remove($user);
         $em->flush();

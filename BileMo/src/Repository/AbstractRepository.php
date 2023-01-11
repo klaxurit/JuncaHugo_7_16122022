@@ -16,7 +16,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
 
         $pager = new Pagerfanta(new QueryAdapter($qb));
-        
+
         $pager->setAllowOutOfRangePages(true);
         $pager->setCurrentPage($page);
         $pager->setMaxPerPage($limit);

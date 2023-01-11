@@ -94,7 +94,7 @@ class ProductController extends AbstractController
      * @param ProductRepository $productRepository
      * @param SerializerInterface $serializer
      */
-    #[Route('/api/products/{id}', name: 'detailProduct', methods: ['GET'])]
+    #[Route('/api/products/{id<\d+>}', name: 'detailProduct', methods: ['GET'])]
     public function getDetailProduct(int $id, ProductRepository $productRepository, SerializerInterface $serializer): JsonResponse 
     {
         $jsonProduct = $serializer->serialize($productRepository->findById($id), 'json');
